@@ -1,0 +1,14 @@
+;; Contract B - Обработка сообщений от ContractA
+() main() {
+    ;; Стандартная проверка входящего сообщения
+    accept_message();
+
+    ;; Получаем данные из входящего сообщения
+    var msg_in = get_msg();
+    int received_balance = msg_in.load_uint(256);
+    slice sender_address = msg_in.load_slice();
+    dict my_dict = msg_in.load_dict();
+
+    ;; Логика обработки данных
+    ;; ... (реакция на получение данных)
+}

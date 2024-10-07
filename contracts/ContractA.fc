@@ -1,0 +1,33 @@
+;; Contract A - Смарт-контракт с большим состоянием и обменом сообщениями
+() main() {
+    ;; Стандартная проверка входящего сообщения
+    accept_message();
+
+    ;; Получаем данные о балансе контракта
+    int my_balance = get_balance();
+
+    ;; Логика контракта
+    ;; Здесь храним несколько uint256, slice и dict в состоянии контракта
+    slice my_address = get_sender_address();
+    int balance = get_balance();
+    var dict my_dict;
+    cell c = begin_cell()
+        .store_uint(balance, 256)  ;; Хранение большого числа
+        .store_slice(my_address)   ;; Хранение адреса отправителя
+        .store_dict(my_dict)       ;; Хранение словаря
+    .end_cell();
+
+    ;; Отправляем данные во внешний контракт (ContractB)
+    send_message_to(0, my_address, c);
+}
+
+() send_message_to(int amount, slice to, cell body) impure {
+    cell msg = begin_cell()
+        .store_uint(0x18, 6)
+        .store_slice(to)
+        .store_coins(amount)
+        .store_ref(body)
+    .end_cell();
+    
+    send_raw_message(msg, 0);
+}
