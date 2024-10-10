@@ -1,0 +1,14 @@
+{
+    "name": "my-ton-project",
+    "version": "1.0.0",
+    "description": "Проект для работы с контрактами на TON",
+    "scripts": {
+      "test": "npx blueprint run tests/contract-interaction.spec.js",
+      "compile": "tondev sol compile contracts/ContractA.fc && tondev sol compile contracts/ContractB.fc"
+    },
+    "dependencies": {
+      "@ton-community/blueprint": "^1.0.0",
+      "tondev": "^1.0.0"
+    }
+  }
+  
