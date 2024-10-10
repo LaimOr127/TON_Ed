@@ -1,0 +1,15 @@
+{
+    "ABI version": 2,
+    "functions": [
+      {
+        "name": "receiveMessage",
+        "inputs": [
+          {"name": "amount", "type": "int"},
+          {"name": "sender", "type": "slice"},
+          {"name": "body", "type": "cell"}
+        ],
+        "outputs": []
+      }
+    ]
+  }
+  

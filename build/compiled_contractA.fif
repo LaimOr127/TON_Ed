@@ -1,0 +1,3 @@
+;; This is a simplified example of the output of the compiled ContractA
+cell: x{FF00200100_..._}
+;; Actual content will be longer, depending on your contract logic.
