@@ -1,0 +1,28 @@
+#include "blueprint.fc"; // Подключаем Blueprint для тестирования
+
+contract test_contractA {
+
+    // Тест 1: Отправка простого сообщения
+    test send_simple_message {
+        int amount = 1000000; // 1 TON
+        slice to = <some_address>; // Адрес получателя
+
+        () send_simple_message(to, amount, null(), 0);
+
+        // Проверяем, что сообщение отправлено
+        expect_message_sent(to, amount);
+    }
+
+    // Тест 2: Обработка ошибки при отправке сообщения
+    test send_message_with_error_handling {
+        int amount = 500000; // 0.5 TON
+        slice to = <some_address>;
+
+        () send_message_with_error_handling(to, amount, null(), 64); // Флаг 64 для игнорирования ошибок
+
+        // Проверяем, что сообщение отправлено
+        expect_message_sent(to, amount);
+        // Проверяем, что ошибка игнорируется
+        expect_message_flag(64);
+    }
+}

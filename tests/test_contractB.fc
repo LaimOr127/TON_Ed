@@ -1,0 +1,29 @@
+#include "blueprint.fc"; // Подключаем Blueprint для тестирования
+
+contract test_contractB {
+
+    // Тест 1: Проверка отправки сообщения с телом
+    test send_message_with_body {
+        int amount = 2000000; // 2 TON
+        slice to = <some_address>;
+        cell body = begin_cell().store_uint(0x1234, 16).end_cell(); // Тело сообщения
+
+        () send_message_with_body(to, amount, body, 0);
+
+        // Проверяем, что тело сообщения отправлено
+        expect_message_body(to, body);
+    }
+
+    // Тест 2: Отправка сообщения с уничтожением контракта
+    test send_message_and_selfdestruct {
+        int amount = 1000000; // 1 TON
+        slice to = <some_address>;
+        cell body = begin_cell().store_uint(0x4321, 16).end_cell(); // Тело сообщения
+
+        () send_message_and_selfdestruct(to, amount, body);
+
+        // Проверяем, что сообщение отправлено и контракт уничтожен
+        expect_message_sent(to, amount);
+        expect_contract_destroyed();
+    }
+}

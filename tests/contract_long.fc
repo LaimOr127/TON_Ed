@@ -1,0 +1,31 @@
+#include "blueprint.fc"; // Подключаем Blueprint для тестирования
+
+contract test_contract_long {
+
+    // Тест 1: Инициализация контракта с большим количеством данных
+    test initialize_large_state {
+        uint256 large_value = 12345678901234567890; // Большое значение
+        dict<slice, int> large_dict = ... ; // Большой словарь данных
+        slice address = <some_address>;
+
+        () initialize_contract_with_large_state(large_value, address, large_dict);
+
+        // Проверяем, что состояние инициализировано
+        expect_state("balance", large_value);
+        expect_state("address", address);
+        expect_state("dict", large_dict);
+    }
+
+    // Тест 2: Обмен сообщениями между контрактами
+    test exchange_messages_between_contracts {
+        slice contractA = <contractA_address>;
+        slice contractB = <contractB_address>;
+        cell message_body = begin_cell().store_uint(0x5678, 32).end_cell();
+
+        // Контракт A отправляет сообщение контракту B
+        () send_message(contractA, contractB, 500000, message_body, 0);
+
+        // Проверяем, что контракт B получил сообщение
+        expect_message_received(contractB, message_body);
+    }
+}

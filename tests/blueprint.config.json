@@ -1,0 +1,13 @@
+{
+    "contracts": {
+      "ContractA": "./contracts/ContractA.fc",
+      "ContractB": "./contracts/ContractB.fc",
+      "ContractLong": "./contracts/contract_long.fc"
+    },
+    "tests": {
+      "testContractA": "./tests/test_contractA.fc",
+      "testContractB": "./tests/test_contractB.fc",
+      "testContractLong": "./tests/test_contract_long.fc"
+    }
+  }
+  
