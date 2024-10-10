@@ -1,14 +1,41 @@
-;; Contract B - Обработка сообщений от ContractA
-() main() {
-    ;; Стандартная проверка входящего сообщения
-    accept_message();
+() recv_external(slice in_msg_body) impure {
+    ;; Входящее внешнее сообщение
+    var op = in_msg_body~load_uint(32);
+    if (op == 3) { ;; Операция 3: отправить ответ контракту A
+        ;; Чтение данных
+        var to = in_msg_body~load_msg_addr();
+        var amount = in_msg_body~load_coins();
+        var body = in_msg_body~load_ref();
 
-    ;; Получаем данные из входящего сообщения
-    var msg_in = get_msg();
-    int received_balance = msg_in.load_uint(256);
-    slice sender_address = msg_in.load_slice();
-    dict my_dict = msg_in.load_dict();
+        ;; Отправка bounceable сообщения контракту A
+        send_message_with_body(amount, to, body, true); ;; true указывает на bounceable сообщение
+    } else {
+        ;; Неизвестная операция
+        throw(102);
+    }
+}
 
-    ;; Логика обработки данных
-    ;; ... (реакция на получение данных)
+() recv_internal(int msg_value, cell msg_body) impure {
+    ;; Входящее внутреннее сообщение от Контракта A
+    var cs = msg_body.begin_parse();
+    var op = cs~load_uint(32);
+    if (op == 4) {
+        ;; Получение данных от Контракта A
+        var sender = cs~load_msg_addr();
+        var received_data = cs~load_coins();
+
+        ;; Логика обработки данных
+        accept_message();
+    }
+}
+
+() send_message_with_body(int amount, slice to, cell body, bool bounceable) impure inline_ref {
+    ;; Сообщение с телом
+    cell msg = begin_cell()
+        .store_msg_flags_and_address_none(bounceable ? BOUNCEABLE : NON_BOUNCEABLE)  ;; Выбор между bounceable и non-bounceable
+        .store_slice(to)        ;; Адрес получателя
+        .store_coins(amount)    ;; Сумма перевода
+        .store_ref(body)        ;; Тело сообщения
+    .end_cell();
+    send_raw_message(msg, 64);  ;; Режим 64: сообщение не уничтожает контракт
 }

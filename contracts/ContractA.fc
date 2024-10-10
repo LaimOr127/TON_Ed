@@ -1,33 +1,42 @@
-;; Contract A - Смарт-контракт с большим состоянием и обменом сообщениями
-() main() {
-    ;; Стандартная проверка входящего сообщения
-    accept_message();
+() recv_external(slice in_msg_body) impure {
+    ;; Входящее внешнее сообщение
+    var op = in_msg_body~load_uint(32);
+    if (op == 1) { ;; Операция 1: отправить сообщение контракту B
+        ;; Чтение данных
+        var to = in_msg_body~load_msg_addr();
+        var amount = in_msg_body~load_coins();
+        var body = in_msg_body~load_ref();
 
-    ;; Получаем данные о балансе контракта
-    int my_balance = get_balance();
-
-    ;; Логика контракта
-    ;; Здесь храним несколько uint256, slice и dict в состоянии контракта
-    slice my_address = get_sender_address();
-    int balance = get_balance();
-    var dict my_dict;
-    cell c = begin_cell()
-        .store_uint(balance, 256)  ;; Хранение большого числа
-        .store_slice(my_address)   ;; Хранение адреса отправителя
-        .store_dict(my_dict)       ;; Хранение словаря
-    .end_cell();
-
-    ;; Отправляем данные во внешний контракт (ContractB)
-    send_message_to(0, my_address, c);
+        ;; Отправка bounceable сообщения контракту B
+        send_simple_message(amount, to, body, true); ;; true указывает на bounceable сообщение
+    } else {
+        ;; Неизвестная операция
+        throw(101);
+    }
 }
 
-() send_message_to(int amount, slice to, cell body) impure {
+() recv_internal(int msg_value, cell msg_body) impure {
+    ;; Входящее внутреннее сообщение
+    var cs = msg_body.begin_parse();
+    var op = cs~load_uint(32);
+    if (op == 2) {
+        ;; Получение сообщения от Контракта B
+        var sender = cs~load_msg_addr();
+        var response_data = cs~load_coins();
+        
+        ;; Логика обработки данных от Контракта B
+        accept_message();
+        ;; Можно выполнить дополнительные действия
+    }
+}
+
+() send_simple_message(int amount, slice to, cell body, bool bounceable) impure inline_ref {
+    ;; Простое сообщение с переводом и телом
     cell msg = begin_cell()
-        .store_uint(0x18, 6)
-        .store_slice(to)
-        .store_coins(amount)
-        .store_ref(body)
+        .store_msg_flags_and_address_none(bounceable ? BOUNCEABLE : NON_BOUNCEABLE)  ;; Выбор между bounceable и non-bounceable
+        .store_slice(to)        ;; Адрес получателя
+        .store_coins(amount)    ;; Сумма перевода
+        .store_ref(body)        ;; Тело сообщения
     .end_cell();
-    
-    send_raw_message(msg, 0);
+    send_raw_message(msg, 1);  ;; Режим 1: сообщение может быть bounced
 }

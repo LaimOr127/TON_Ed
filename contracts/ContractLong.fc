@@ -1,0 +1,39 @@
+;; contract_long.fc — Основной контракт для обработки сообщений с большими данными
+
+() receive_internal(int my_param, cell in_msg, slice in_msg_body) {
+    ;; Инициализация переменных с большими объемами данных
+    uint256 big_int_1 = 0x1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF;
+    uint256 big_int_2 = 0xFEDCBA0987654321FEDCBA0987654321FEDCBA0987654321FEDCBA0987654321;
+
+    ;; Загрузка адреса из входящего сообщения
+    slice sender_address = in_msg_body~load_msg_addr();
+
+    ;; Проверка размера сообщения: если больше 1023 бит, выбросить ошибку
+    if (in_msg_body.bits() > 1023) {
+        throw(123);  // Ошибка: сообщение слишком велико
+    }
+
+    ;; Создаем словарь для хранения данных
+    dict my_dict = begin_dict();
+
+    ;; Создаем ячейку для хранения больших данных
+    cell dict_value = begin_cell()
+        .store_uint(big_int_1, 256)  // Сохраняем первое uint256
+        .store_uint(big_int_2, 256)  // Сохраняем второе uint256
+    .end_cell();
+
+    ;; Запись данных в словарь с использованием ключа
+    my_dict.set(0x01, dict_value);  // Сохраняем ячейку под ключом 0x01
+    my_dict.set(0x02, dict_value);  // Сохраняем вторую ячейку под ключом 0x02
+
+    ;; Логика дальнейшей обработки сообщения
+    ;; Здесь можно добавить отправку обратного сообщения
+    var msg = begin_cell()
+        .store_msg_flags_and_address_none(NON_BOUNCEABLE)  // Отправляем не отскакивающее сообщение
+        .store_slice(sender_address)  // Адрес отправителя
+        .store_coins(0)  // Без перевода монет
+        .store_op(0x01)  // Пример операции для возврата значения
+    .end_cell();
+
+    send_raw_message(msg, 1);  // Отправляем ответное сообщение
+}
