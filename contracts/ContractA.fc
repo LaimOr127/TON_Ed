@@ -1,4 +1,12 @@
+int seqno = 0;  ;; Инициализация seqno
+
 () recv_external(slice in_msg_body) impure {
+    ;; Проверка seqno для защиты от повторных сообщений
+    int incoming_seqno = in_msg_body~load_uint(32);
+    if (incoming_seqno != seqno) {
+        throw(100);  ;; Отклоняем сообщение, если seqno не совпадает
+    }
+
     ;; Входящее внешнее сообщение
     var op = in_msg_body~load_uint(32);
     if (op == 1) { ;; Операция 1: отправить сообщение контракту B
@@ -6,6 +14,9 @@
         var to = in_msg_body~load_msg_addr();
         var amount = in_msg_body~load_coins();
         var body = in_msg_body~load_ref();
+
+        ;; Увеличиваем seqno после успешной обработки сообщения
+        seqno += 1;
 
         ;; Отправка bounceable сообщения контракту B
         send_simple_message(amount, to, body, true); ;; true указывает на bounceable сообщение
@@ -24,9 +35,11 @@
         var sender = cs~load_msg_addr();
         var response_data = cs~load_coins();
         
-        ;; Логика обработки данных от Контракта B
+        ;; Принятие сообщения и оплата газа
         accept_message();
-        ;; Можно выполнить дополнительные действия
+
+        ;; Логика обработки данных от Контракта B
+        ;; Дополнительные действия можно выполнить здесь
     }
 }
 
