@@ -1,0 +1,29 @@
+;; contract_long_init.fc — Контракт инициализации больших данных
+
+() init_contract() {
+    ;; Инициализируем переменные с большими объемами данных
+    uint256 init_big_int_1 = 0xAAAAAAAABBBBBBBBCCCCCCCCDDDDDDDD1234567890ABCDEF1234567890ABCDEF;
+    uint256 init_big_int_2 = 0x111122223333444455556666777788889999AAAABBBBCCCCDDDDEEEEFFFF0000;
+
+    ;; Инициализация адреса
+    slice init_address = begin_cell().store_msg_addr();
+
+    ;; Создаем и заполняем словарь
+    dict my_dict = begin_dict(); 
+    cell dict_value = begin_cell()
+        .store_uint(init_big_int_1, 256)
+        .store_uint(init_big_int_2, 256)
+    .end_cell();
+    
+    my_dict.set(0x01, dict_value);
+    my_dict.set(0x02, dict_value);
+
+    ;; Собираем ячейку для хранения состояния контракта
+    cell state = begin_cell()
+        .store_slice(init_address)
+        .store_dict(my_dict)
+    .end_cell();
+
+    ;; Устанавливаем состояние контракта
+    set_data(state);
+}
