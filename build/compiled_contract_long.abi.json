@@ -1,0 +1,35 @@
+{
+    "ABI version": 2,
+    "functions": [
+      {
+        "name": "sendSimpleMessage",
+        "inputs": [
+          {"name": "amount", "type": "int"},
+          {"name": "to", "type": "slice"},
+          {"name": "body", "type": "cell"},
+          {"name": "mode", "type": "int"}
+        ],
+        "outputs": []
+      },
+      {
+        "name": "receiveMessage",
+        "inputs": [
+          {"name": "amount", "type": "int"},
+          {"name": "sender", "type": "slice"},
+          {"name": "body", "type": "cell"}
+        ],
+        "outputs": []
+      },
+      {
+        "name": "largeStateExchange",
+        "inputs": [
+          {"name": "stateData", "type": "cell"},
+          {"name": "info", "type": "slice"}
+        ],
+        "outputs": []
+      }
+    ],
+    "events": [],
+    "data": []
+  }
+  

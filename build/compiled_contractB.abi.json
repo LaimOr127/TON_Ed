@@ -1,0 +1,36 @@
+{
+  "ABI version": 2,
+  "version": "2.2",
+  "functions": [
+    {
+      "name": "recv_external",
+      "inputs": [
+        {"name": "in_msg_body", "type": "slice"}
+      ],
+      "outputs": []
+    },
+    {
+      "name": "recv_internal",
+      "inputs": [
+        {"name": "msg_value", "type": "int"},
+        {"name": "msg_body", "type": "cell"}
+      ],
+      "outputs": []
+    },
+    {
+      "name": "send_message_with_body",
+      "inputs": [
+        {"name": "amount", "type": "int"},
+        {"name": "to", "type": "slice"},
+        {"name": "body", "type": "cell"},
+        {"name": "bounceable", "type": "bool"}
+      ],
+      "outputs": []
+    }
+  ],
+  "data": [],
+  "events": [],
+  "fields": [
+    {"name": "balance", "type": "int"}
+  ]
+}
